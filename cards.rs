@@ -1,4 +1,4 @@
-// Copyright © 2018 Bart Massey
+// Copyright © 2018 Roey Darwish Dror, Bart Massey
 // This work is available under the terms of the "GPL v3.0".
 // Please see the file LICENSE in this distribution for
 // license information.
