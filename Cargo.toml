@@ -5,11 +5,11 @@
 
 [package]
 name = "cards"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Bart Massey <bart@cs.pdx.edu>"]
 
 [dependencies]
-rand = "*"
+rand = "0.7"
 
 [[bin]]
 name = "cards"

@@ -11,10 +11,11 @@
 
 extern crate rand;
 
-use rand::{thread_rng, Rng};
-use std::vec::Vec;
-use std::iter::Iterator;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use std::fmt;
+use std::iter::Iterator;
+use std::vec::Vec;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub enum Suit {
@@ -25,19 +26,9 @@ pub enum Suit {
 }
 use Suit::*;
 
-const SUITS: &[Suit] = &[
-    Clubs,
-    Diamonds,
-    Hearts,
-    Spades,
-];
+const SUITS: &[Suit] = &[Clubs, Diamonds, Hearts, Spades];
 
-const SUIT_NAMES: &[char] = &[
-    'C',
-    'D',
-    'H',
-    'S',
-];
+const SUIT_NAMES: &[char] = &['C', 'D', 'H', 'S'];
 
 impl fmt::Display for Suit {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -65,30 +56,11 @@ pub enum Rank {
 use Rank::*;
 
 const RANKS: &[Rank] = &[
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
-    Eight,
-    Nine,
-    Ten,
-    Jack,
-    Queen,
-    King,
-    Ace,
-    Joker,
+    Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen,
+    King, Ace, Joker,
 ];
 
-const RANK_NAMES: &[char] = &[
-    'T',
-    'J',
-    'Q',
-    'K',
-    'A',
-    '?',
-];
+const RANK_NAMES: &[char] = &['T', 'J', 'Q', 'K', 'A', '?'];
 
 impl fmt::Display for Rank {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -108,15 +80,9 @@ pub enum Color {
 }
 use Color::*;
 
-const COLORS: &[Color] = &[
-    Black,
-    Red,
-];
+const COLORS: &[Color] = &[Black, Red];
 
-const COLOR_NAMES: &[char] = &[
-    'R',
-    'B',
-];
+const COLOR_NAMES: &[char] = &['R', 'B'];
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -134,10 +100,8 @@ use Card::*;
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            SuitCard(suit, rank) =>
-                write!(f, "{}{}", rank, suit),
-            SuitJoker(color) =>
-                write!(f, "{}{}", color, Joker),
+            SuitCard(suit, rank) => write!(f, "{}{}", rank, suit),
+            SuitJoker(color) => write!(f, "{}{}", color, Joker),
         }
     }
 }
@@ -259,7 +223,7 @@ impl Deck {
 
     pub fn shuffle(&mut self) {
         let mut rng = thread_rng();
-        rng.shuffle(&mut self.cards)
+        self.cards.shuffle(&mut rng)
     }
 
     pub fn draw(&mut self) -> Option<Card> {
@@ -280,7 +244,12 @@ impl Deck {
 }
 
 fn main() {
-    let deck = Deck::full();
+    let mut deck = Deck::full();
+    for card in deck.iter() {
+        println!("{}", card);
+    }
+    deck.shuffle();
+
     for card in deck.iter() {
         println!("{}", card);
     }
@@ -298,7 +267,8 @@ mod tests {
         );
 
         assert!(
-            Card::SuitJoker(Color::Black).rank() > Card::SuitCard(Suit::Spades, SuitRank::Ace).rank()
+            Card::SuitJoker(Color::Black).rank()
+                > Card::SuitCard(Suit::Spades, SuitRank::Ace).rank()
         );
     }
 }
