@@ -9,8 +9,6 @@
 //     https://github.com/r-darwish/war/tree/
 //       a43e4723898ae5f48fe1608f9622168a8aa2ca41
 
-extern crate rand;
-
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::fmt;
@@ -243,32 +241,15 @@ impl Deck {
     }
 }
 
-fn main() {
-    let mut deck = Deck::full();
-    for card in deck.iter() {
-        println!("{}", card);
-    }
-    deck.shuffle();
+#[test]
+fn ranks() {
+    assert_eq!(
+        Card::SuitJoker(Color::Black).rank(),
+        Card::SuitJoker(Color::Red).rank()
+    );
 
-    for card in deck.iter() {
-        println!("{}", card);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn ranks() {
-        assert_eq!(
-            Card::SuitJoker(Color::Black).rank(),
-            Card::SuitJoker(Color::Red).rank()
-        );
-
-        assert!(
-            Card::SuitJoker(Color::Black).rank()
-                > Card::SuitCard(Suit::Spades, SuitRank::Ace).rank()
-        );
-    }
+    assert!(
+        Card::SuitJoker(Color::Black).rank()
+            > Card::SuitCard(Suit::Spades, Rank::Ace).rank()
+    );
 }
