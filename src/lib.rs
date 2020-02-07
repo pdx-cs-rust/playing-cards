@@ -3,11 +3,12 @@
 // Please see the file LICENSE in this distribution for
 // license information.
 
-// Playing Cards, with a sample driver.
+//! Playing Cards. Derived from
+//! https://github.com/r-darwish/war/tree/
 
-// Derived from
-//     https://github.com/r-darwish/war/tree/
-//       a43e4723898ae5f48fe1608f9622168a8aa2ca41
+//
+// https://github.com/r-darwish/war/tree/
+//   a43e4723898ae5f48fe1608f9622168a8aa2ca41
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -88,18 +89,21 @@ impl fmt::Display for Color {
     }
 }
 
+/// A playing card.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub enum Card {
+    /// A "standard" card.
     SuitCard(Suit, Rank),
-    SuitJoker(Color),
+    /// A red or black Joker.
+    JokerCard(Color),
 }
 use Card::*;
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
+        match self {
             SuitCard(suit, rank) => write!(f, "{}{}", rank, suit),
-            SuitJoker(color) => write!(f, "{}{}", color, Joker),
+            JokerCard(color) => write!(f, "{}{}", color, Joker),
         }
     }
 }
@@ -115,6 +119,8 @@ impl From<Suit> for Color {
     }
 }
 
+/// Iterator delivering the possible cards in rank-suit
+/// order.
 pub struct IterCards {
     rank: usize,
     suit: usize,
@@ -122,6 +128,7 @@ pub struct IterCards {
 }
 
 impl IterCards {
+    /// Get an iterator over the standard cards.
     pub fn standard() -> IterCards {
         IterCards {
             rank: 0,
@@ -130,6 +137,7 @@ impl IterCards {
         }
     }
 
+    /// Get an iterator over the standard cards and jokers.
     pub fn full() -> IterCards {
         IterCards {
             rank: 0,
@@ -149,7 +157,7 @@ impl Iterator for IterCards {
             if !self.jokers || self.suit >= COLORS.len() {
                 return None;
             }
-            let result = SuitJoker(COLORS[self.suit]);
+            let result = JokerCard(COLORS[self.suit]);
             self.suit += 1;
             return Some(result);
         }
@@ -164,93 +172,124 @@ impl Iterator for IterCards {
 }
 
 impl Card {
+    /// Rank of this card.
     pub fn rank(self) -> Rank {
         match self {
-            Card::SuitJoker(_) => Rank::Joker,
-            Card::SuitCard(_, ref rank) => *rank,
+            JokerCard(_) => Rank::Joker,
+            SuitCard(_, ref rank) => *rank,
         }
     }
 
+    /// Suit of this card.
     pub fn suit(self) -> Option<Suit> {
         match self {
-            Card::SuitJoker(_) => None,
-            Card::SuitCard(ref suit, _) => Some(*suit),
+            JokerCard(_) => None,
+            SuitCard(ref suit, _) => Some(*suit),
         }
     }
 
+    /// Color of this card: red or black.
     pub fn color(self) -> Color {
         match self {
-            Card::SuitJoker(color) => color,
-            Card::SuitCard(ref suit, _) => Color::from(*suit),
+            JokerCard(color) => color,
+            SuitCard(ref suit, _) => Color::from(*suit),
         }
     }
 
+    /// Get an iterator over the standard cards.
     pub fn iter_standard() -> IterCards {
         IterCards::standard()
     }
 
+    /// Get an iterator over the standard cards and jokers.
     pub fn iter_full() -> IterCards {
         IterCards::full()
     }
 }
 
+/// A "deck" of cards is an ordered collection.
 #[derive(Debug, Clone, Default)]
 pub struct Deck {
     cards: Vec<Card>,
 }
 
 impl Deck {
+    /// Make a new empty deck.
     pub fn new() -> Self {
         Self { cards: Vec::new() }
     }
 
+    /// Make a new empty deck with reserved space
+    /// for `capacity` cards.
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            cards: Vec::with_capacity(capacity),
+        }
+    }
+
+    /// Make a new standard deck.
     pub fn standard() -> Self {
         Self {
             cards: Card::iter_standard().collect(),
         }
     }
 
+    /// Make a new standard deck with jokers.
     pub fn full() -> Self {
         Self {
             cards: Card::iter_full().collect(),
         }
     }
 
+    /// Iterator over the current deck.
     pub fn iter(&self) -> std::slice::Iter<Card> {
         self.cards.iter()
     }
 
+    /// Shuffle the current deck.
     pub fn shuffle(&mut self) {
         let mut rng = thread_rng();
         self.cards.shuffle(&mut rng)
     }
 
+    /// Pop the top card off the current deck.
     pub fn draw(&mut self) -> Option<Card> {
         self.cards.pop()
     }
 
+    /// Put `card` on top of the current deck.
     pub fn put(&mut self, card: Card) {
         self.cards.push(card)
     }
 
-    pub fn cards(&self) -> &Vec<Card> {
-        &self.cards
+    /// Get the underlying deck as a vector.
+    pub fn into_inner(self) -> Vec<Card> {
+        self.cards
     }
 
-    pub fn append(&mut self, other: &mut Self) {
-        self.cards.append(&mut other.cards);
+    /// Make a vector of cards into a deck.
+    pub fn from_inner(cards: Vec<Card>) -> Self {
+        Self { cards }
+    }
+
+    /// Move all the cards of `other` onto the top
+    /// of this deck, in the order they appear.
+    pub fn append(&mut self, other: Self) {
+        self.cards.extend(other.cards.into_iter());
+    }
+
+    /// Reverse the order of cards in this deck.
+    pub fn reverse(&mut self) {
+        self.cards.reverse();
     }
 }
 
 #[test]
 fn ranks() {
     assert_eq!(
-        Card::SuitJoker(Color::Black).rank(),
-        Card::SuitJoker(Color::Red).rank()
+        JokerCard(Color::Black).rank(),
+        JokerCard(Color::Red).rank()
     );
 
-    assert!(
-        Card::SuitJoker(Color::Black).rank()
-            > Card::SuitCard(Suit::Spades, Rank::Ace).rank()
-    );
+    assert!(JokerCard(Black).rank() > SuitCard(Spades, Ace).rank());
 }
