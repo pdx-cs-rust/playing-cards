@@ -66,7 +66,7 @@ impl fmt::Display for Rank {
         if *self as usize >= names_start {
             write!(f, "{}", RANK_NAMES[*self as usize - names_start])
         } else {
-            write!(f, "{}", *self as usize)
+            write!(f, "{}", 2 + *self as usize)
         }
     }
 }
