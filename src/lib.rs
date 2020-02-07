@@ -164,24 +164,24 @@ impl Iterator for IterCards {
 }
 
 impl Card {
-    pub fn rank(&self) -> Rank {
+    pub fn rank(self) -> Rank {
         match self {
-            &Card::SuitJoker(_) => Rank::Joker,
-            &Card::SuitCard(_, ref rank) => *rank,
+            Card::SuitJoker(_) => Rank::Joker,
+            Card::SuitCard(_, ref rank) => *rank,
         }
     }
 
-    pub fn suit(&self) -> Option<Suit> {
+    pub fn suit(self) -> Option<Suit> {
         match self {
-            &Card::SuitJoker(_) => None,
-            &Card::SuitCard(ref suit, _) => Some(*suit),
+            Card::SuitJoker(_) => None,
+            Card::SuitCard(ref suit, _) => Some(*suit),
         }
     }
 
-    pub fn color(&self) -> Color {
+    pub fn color(self) -> Color {
         match self {
-            &Card::SuitJoker(color) => color,
-            &Card::SuitCard(ref suit, _) => Color::from(*suit),
+            Card::SuitJoker(color) => color,
+            Card::SuitCard(ref suit, _) => Color::from(*suit),
         }
     }
 
@@ -194,6 +194,7 @@ impl Card {
     }
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct Deck {
     cards: Vec<Card>,
 }
