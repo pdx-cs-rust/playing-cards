@@ -55,8 +55,7 @@ pub enum Rank {
 use Rank::*;
 
 const RANKS: &[Rank] = &[
-    Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen,
-    King, Ace, Joker,
+    Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace, Joker,
 ];
 
 const RANK_NAMES: &[char] = &['T', 'J', 'Q', 'K', 'A', '?'];
@@ -286,10 +285,7 @@ impl Deck {
 
 #[test]
 fn ranks() {
-    assert_eq!(
-        JokerCard(Color::Black).rank(),
-        JokerCard(Color::Red).rank()
-    );
+    assert_eq!(JokerCard(Color::Black).rank(), JokerCard(Color::Red).rank());
 
     assert!(JokerCard(Black).rank() > SuitCard(Spades, Ace).rank());
 }
